@@ -1,0 +1,12 @@
+<app-canvas (onCreate)="onCreateCanvas()" (onBeforeRender)="animate()"></app-canvas>
+
+<ul class="animation-list">
+  <li class="animation-list__item" *ngFor="let animation of animations">
+    <button
+      class="animation-list__button"
+      type="button"
+      (click)="sonicModelService.changeAnimation(animation.name)">
+      {{ animation.name }}
+    </button>
+  </li>
+</ul>

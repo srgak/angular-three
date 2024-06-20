@@ -1,18 +1,17 @@
-<ngt-mesh [rotation]="[planeRotationX, 0, 0]">
-  <ngt-plane-geometry *args="[40, 40]"></ngt-plane-geometry>
-  <ngt-mesh-standard-material [map]="planeTexure" [side]="planeSide"></ngt-mesh-standard-material>
-</ngt-mesh>
+<app-scene-floor></app-scene-floor>
 
-<ngt-rect-area-light
-  #rectAreaLight
-  [color]="'white'"
-  [intensity]="5"
-  [width]="12"
-  [height]="4"
-  [position]="[-5, 5, 0]"
-  [rotation]="rectAreaLightRotation">
-</ngt-rect-area-light>
-<ngt-rect-area-light-helper *args="[rectAreaLight]"></ngt-rect-area-light-helper>
+<ngt-directional-light
+  #directionalLight
+  color="white"
+  [position]="[-10, 10, -15]"
+  [intensity]="2"
+  [castShadow]="true"></ngt-directional-light>
+<ngt-directional-light-helper *args="[directionalLight]"></ngt-directional-light-helper>
 
 <ngt-orbit-controls *args="[camera, glDom]" [enableDamping]="true" />
-<ngt-axes-helper [size]="3"></ngt-axes-helper>
+<ngt-axes-helper *args="[5]"></ngt-axes-helper>
+
+<ngt-mesh [position]="[0, 1, 0]" [castShadow]="true" [receiveShadow]="true">
+  <ngt-sphere-geometry *args="[1, 64, 64]"></ngt-sphere-geometry>
+  <ngt-mesh-standard-material color="red" [roughness]="0"></ngt-mesh-standard-material>
+</ngt-mesh>
