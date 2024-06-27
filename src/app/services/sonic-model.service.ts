@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { AnimationAction, AnimationClip, AnimationMixer } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { ThreeMainService } from './three-main.service';
+import { ThreeStoreService } from './three-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,13 @@ export class SonicModelService {
   public mixer!: AnimationMixer;
   public action!: AnimationAction;
   public onLoaded = new Subject<GLTF>();
+  public onProgress = new Subject<ProgressEvent<EventTarget>>();
+  public onError = new Subject<ErrorEvent>();
 
-  constructor(private readonly threeMainService: ThreeMainService) {}
+  constructor(
+    private readonly threeStoreService: ThreeStoreService,
+    private readonly threeMainService: ThreeMainService,
+  ) {}
 
   public initModel(): void {
     const loader = new GLTFLoader();
@@ -24,7 +30,7 @@ export class SonicModelService {
       this.gltf = gltf;
       this.mixer = new AnimationMixer(scene);
 
-      this.threeMainService.scene.add(scene);
+      this.threeStoreService.scene.add(scene);
       this.threeMainService.saveObject('sonic', scene);
 
       this.onLoaded.next(gltf);

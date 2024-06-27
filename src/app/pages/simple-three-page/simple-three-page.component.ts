@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AnimationClip, DirectionalLight } from 'three';
+import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
+import {
+  AnimationClip,
+  DirectionalLight,
+  Mesh,
+  MeshStandardMaterial,
+  Raycaster,
+  SphereGeometry,
+  Vector2,
+} from 'three';
 import { ThreeMainService } from '../../services/three-main.service';
 import { SonicModelService } from '../../services/sonic-model.service';
+import { ThreeStoreService } from '../../services/three-store.service';
 
 @Component({
   selector: 'app-simple-three-page',
@@ -10,16 +19,37 @@ import { SonicModelService } from '../../services/sonic-model.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleThreePageComponent {
+  // @HostListener('window:mousedown') public onMouseDown(): void {
+  //   console.log('clicked');
+
+  //   const coords = new Vector2(
+
+  //   )
+  //   this.raycaster.setFromCamera(coords, this.threeStoreService.camera)
+  // }
   public animations!: AnimationClip[];
+  private raycaster = new Raycaster();
 
   constructor(
+    private readonly threeStoreService: ThreeStoreService,
     public readonly threeMainService: ThreeMainService,
     public readonly sonicModelService: SonicModelService,
   ) {}
 
   public onCreateCanvas(): void {
-    this.threeMainService.renderer.shadowMap.enabled = true;
+    this.threeStoreService.renderer.shadowMap.enabled = true;
 
+    this.initObject();
+    this.settingsObject();
+
+    this.threeMainService.initControls();
+
+    this.sonicModelService.onLoaded.subscribe(({ animations }) => {
+      this.animations = animations;
+    });
+  }
+
+  private initObject(): void {
     this.threeMainService.initObject(
       'directionalLight',
       this.threeMainService.createDirectionalLight({ color: 'white', intensity: 1 }),
@@ -30,9 +60,17 @@ export class SimpleThreePageComponent {
     );
     this.threeMainService.initObject('floor', this.threeMainService.createFloor());
     this.threeMainService.initObject('axesHelper', this.threeMainService.createAxesHelper(3));
-
     this.sonicModelService.initModel();
+    this.threeMainService.initObject(
+      'sphere',
+      new Mesh(
+        new SphereGeometry(1, 100),
+        new MeshStandardMaterial({ color: 'red', roughness: 0 }),
+      ),
+    );
+  }
 
+  private settingsObject(): void {
     this.threeMainService.settingObject('floor', (plane) => {
       plane.rotateX(Math.PI * -0.5);
       plane.receiveShadow = true;
@@ -47,17 +85,14 @@ export class SimpleThreePageComponent {
     this.threeMainService.settingMainCamera((camera) => {
       camera.position.set(-5, 5, 5);
     });
-
-    this.threeMainService.initControls();
-
-    this.sonicModelService.onLoaded.subscribe(({ animations }) => {
-      this.animations = animations;
+    this.threeMainService.settingObject('sphere', (sphere) => {
+      sphere.position.set(3, 1, 0);
     });
   }
 
   public animate(): void {
     this.threeMainService.settingObject('sonic', () => {
-      const delta = this.threeMainService.clock.getDelta();
+      const delta = this.threeStoreService.clock.getDelta();
 
       this.sonicModelService.mixer.update(delta);
     });

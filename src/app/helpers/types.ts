@@ -1,10 +1,4 @@
-import {
-  ColorRepresentation,
-  OrthographicCamera,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-} from 'three';
+import { ColorRepresentation, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 export interface ScreenSize {
   width: number;
@@ -15,7 +9,7 @@ export interface MainSettings {
   screenSize: ScreenSize;
   scene: Scene;
   canvas: HTMLCanvasElement;
-  camera: PerspectiveCamera | OrthographicCamera;
+  camera: PerspectiveCamera;
   renderer: WebGLRenderer;
 }
 

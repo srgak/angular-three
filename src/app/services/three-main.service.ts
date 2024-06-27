@@ -3,7 +3,6 @@ import {
   AxesHelper,
   BoxGeometry,
   Camera,
-  Clock,
   DirectionalLight,
   DoubleSide,
   Material,
@@ -11,43 +10,31 @@ import {
   MeshStandardMaterial,
   NearestFilter,
   Object3D,
-  OrthographicCamera,
-  PerspectiveCamera,
   PlaneGeometry,
   RepeatWrapping,
   SRGBColorSpace,
-  Scene,
   TextureLoader,
-  WebGLRenderer,
 } from 'three';
-import { DirectionalLightSettings, MainSettings } from '../helpers';
+import { DirectionalLightSettings } from '../helpers';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ThreeStoreService } from './three-store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThreeMainService {
-  public renderer!: WebGLRenderer;
-  public scene!: Scene;
-  public camera!: PerspectiveCamera | OrthographicCamera;
-  public canvas!: HTMLCanvasElement;
-  public clock = new Clock();
-  public objectsStore = new Map();
-
-  public init(initialSettings: MainSettings): void {
-    this.renderer = initialSettings.renderer;
-    this.scene = initialSettings.scene;
-    this.camera = initialSettings.camera;
-    this.canvas = initialSettings.canvas;
-  }
+  constructor(private readonly threeStoreService: ThreeStoreService) {}
 
   public initObject(objectName: string, object: Object3D): void {
-    this.scene.add(object);
+    this.threeStoreService.scene.add(object);
     this.saveObject(objectName, object);
   }
 
   public initControls(): void {
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
+    const controls = new OrbitControls(
+      this.threeStoreService.camera,
+      this.threeStoreService.renderer.domElement,
+    );
 
     controls.update();
   }
@@ -96,14 +83,14 @@ export class ThreeMainService {
   }
 
   public settingMainCamera(settingFunction: (camera: Camera) => void): void {
-    settingFunction(this.camera);
+    settingFunction(this.threeStoreService.camera);
   }
 
   public saveObject<T>(name: string, object: T): void {
-    this.objectsStore.set(name, object);
+    this.threeStoreService.objectsStore.set(name, object);
   }
 
   public getObject<T = Object3D>(objectName: string): T {
-    return this.objectsStore.get(objectName) as T;
+    return this.threeStoreService.objectsStore.get(objectName) as T;
   }
 }

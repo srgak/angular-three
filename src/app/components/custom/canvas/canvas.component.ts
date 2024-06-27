@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { MainSettings, ScreenSize } from '../../../helpers';
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
-import { ThreeMainService } from '../../../services/three-main.service';
+import { ThreeStoreService } from '../../../services/three-store.service';
 
 @Component({
   selector: 'app-canvas',
@@ -23,13 +23,7 @@ import { ThreeMainService } from '../../../services/three-main.service';
 })
 export class CanvasComponent implements AfterViewInit {
   @HostListener('window:resize') public onResize(): void {
-    this.screenSize.width = window.innerWidth;
-    this.screenSize.height = window.innerHeight;
-    this.camera.aspect = this.screenSize.width / this.screenSize.height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(this.screenSize.width, this.screenSize.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.render(this.scene, this.camera);
+    this.threeStoreServices.updateOnResize();
   }
   @ViewChild('canvas') public canvasRef!: ElementRef<HTMLCanvasElement>;
   @Input() public camera: PerspectiveCamera = new PerspectiveCamera(
@@ -48,7 +42,7 @@ export class CanvasComponent implements AfterViewInit {
   private readonly scene = new Scene();
   private renderer!: WebGLRenderer;
 
-  constructor(private readonly threeMainService: ThreeMainService) {}
+  constructor(private readonly threeStoreServices: ThreeStoreService) {}
 
   ngAfterViewInit(): void {
     this.renderer = new WebGLRenderer({
@@ -67,7 +61,7 @@ export class CanvasComponent implements AfterViewInit {
     this.scene.add(this.camera);
     this.renderer.setSize(this.screenSize.width, this.screenSize.height);
     this.renderer.render(this.scene, this.camera);
-    this.threeMainService.init(initialSettings);
+    this.threeStoreServices.initStore(initialSettings);
 
     this.onCreate.emit(initialSettings);
 
