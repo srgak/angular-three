@@ -1,13 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
-import {
-  AnimationClip,
-  DirectionalLight,
-  Mesh,
-  MeshStandardMaterial,
-  Raycaster,
-  SphereGeometry,
-  Vector2,
-} from 'three';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { AnimationClip, DirectionalLight, Mesh, MeshStandardMaterial, SphereGeometry } from 'three';
 import { ThreeMainService } from '../../services/three-main.service';
 import { SonicModelService } from '../../services/sonic-model.service';
 import { ThreeStoreService } from '../../services/three-store.service';
@@ -19,16 +11,7 @@ import { ThreeStoreService } from '../../services/three-store.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleThreePageComponent {
-  // @HostListener('window:mousedown') public onMouseDown(): void {
-  //   console.log('clicked');
-
-  //   const coords = new Vector2(
-
-  //   )
-  //   this.raycaster.setFromCamera(coords, this.threeStoreService.camera)
-  // }
   public animations!: AnimationClip[];
-  private raycaster = new Raycaster();
 
   constructor(
     private readonly threeStoreService: ThreeStoreService,
@@ -44,8 +27,11 @@ export class SimpleThreePageComponent {
 
     this.threeMainService.initControls();
 
-    this.sonicModelService.onLoaded.subscribe(({ animations }) => {
+    this.sonicModelService.onLoaded.subscribe(({ animations, scene }) => {
       this.animations = animations;
+      scene.traverse((object) => {
+        object.castShadow = true;
+      });
     });
   }
 
@@ -87,6 +73,7 @@ export class SimpleThreePageComponent {
     });
     this.threeMainService.settingObject('sphere', (sphere) => {
       sphere.position.set(3, 1, 0);
+      sphere.castShadow = true;
     });
   }
 
